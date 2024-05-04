@@ -39,13 +39,63 @@ class _JuegoState extends State<Juego> {
         }
       }
     });
+    //verCombinaciones(numerosDados);
   }
 
+  Widget verCombinaciones(List<int> numerosDados){
+    var conteo = Map<int,int>();
+    String resultado = '';
+
+    // Conteo de los dados
+    for(var numDado in numerosDados){
+      conteo[numDado] = (conteo[numDado] ?? 0) + 1;
+    }
+    // Verificar si hay generala
+    if(conteo.containsValue(5)){
+      resultado = '¡Generala!';
+    }
+    // Verificar si hay póker
+    else if(conteo.containsValue(4)){
+      int numeroPoker = conteo.entries.firstWhere((entry) => entry.value == 4).key;
+      resultado = 'Póker de $numeroPoker';
+    }
+    // Verificar si hay full
+    else if(conteo.containsValue(3) && conteo.containsValue(2)){
+      resultado = 'Full';
+    }
+    // Verificar si hay escalera
+    else if(conteo.keys.toSet().containsAll({1, 2, 3, 4, 5}) || conteo.keys.toSet().containsAll({2, 3, 4, 5, 6}) || conteo.keys.toSet().containsAll({3, 4, 5, 6, 1}) || conteo.keys.toSet().containsAll({2, 4, 5, 6, 1})){
+      resultado = 'Escalera';
+    }
+    // Verificar si hay trío
+    else if(conteo.containsValue(3)){
+      int numeroTrio = conteo.entries.firstWhere((entry) => entry.value == 3).key;
+      resultado = '3 al $numeroTrio';
+    }
+    // Verificar si hay doble par
+    else if(conteo.values.where((cantidad) => cantidad == 2).length == 2){
+      resultado = 'Doble par';
+    }
+    // Verificar si hay par
+    else if(conteo.containsValue(2)){
+      int numeroPar = conteo.entries.firstWhere((entry) => entry.value == 2).key;
+      resultado = 'Dos al $numeroPar';
+    }
+
+    // Si no hay ninguna combinación especial, mostrar la cantidad de cada dado
+    if(resultado.isEmpty){
+      conteo.forEach((numero, cantidad) {
+        resultado += 'Número $numero: $cantidad veces\n';
+      });
+    }
+    return Text(resultado, style: TextStyle(fontSize: 24));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
+        verCombinaciones(numerosDados),
         Row(
           children: numerosDados.asMap().entries.map((entry) {
             int idx = entry.key;
@@ -77,5 +127,4 @@ class _JuegoState extends State<Juego> {
       ],
     );
   }
-
 }
